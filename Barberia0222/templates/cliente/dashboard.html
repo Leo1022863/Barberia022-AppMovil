@@ -1,0 +1,387 @@
+{% extends 'base.html' %}
+
+{% block title %}Barbería 022 - Mi Panel de Control{% endblock %}
+
+{% block content %}
+<div class="container mt-5 text-white">
+    <div class="row align-items-center mb-4">
+        <div class="col-md-8">
+            <span class="badge bg-warning text-dark mb-2" style="font-weight: 600; letter-spacing: 1px;">ZONA DE CLIENTES</span>
+            <h1 style="color: #c9a84c; font-weight: 700;">¡Bienvenido, {{ current_user.nombre }}!</h1>
+            <p class="text-white-50">Gestiona tus cortes de cabello, revisa tus estados y reserva nuevos turnos.</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <button type="button" class="btn btn-warning fw-bold px-4 py-2 text-dark shadow-sm" data-bs-toggle="modal" data-bs-target="#modalAgendarCita">
+                <i class="bi bi-calendar-plus me-2"></i> Agendar Nueva Cita
+            </button>
+        </div>
+    </div>
+
+    <!-- TABLA DE MIS CITAS SOLICITADAS -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="p-4 rounded" style="background-color: #1a1c1e; border: 1px solid #2c3034;">
+                <h4 class="mb-4" style="color: #c9a84c; font-weight: 600;">
+                    <i class="bi bi-clock-history me-2"></i> Mis Citas Solicitadas
+                </h4>
+
+                {% if citas %}
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover align-middle mb-0" style="border-color: #2c3034;">
+                        <thead>
+                            <tr style="color: #c9a84c; border-bottom: 2px solid #2c3034;">
+                                <th scope="col" class="py-3">Fecha</th>
+                                <th scope="col" class="py-3">Hora</th>
+                                <th scope="col" class="py-3">Servicio</th>
+                                <th scope="col" class="py-3">Barbero Asignado</th>
+                                <th scope="col" class="py-3">Precio</th>
+                                <th scope="col" class="py-3">Estado</th>
+                                <th scope="col" class="py-3 text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cita in citas %}
+                            <tr>
+                                <td>
+                                    <span class="badge bg-dark border border-secondary text-white px-3 py-1.5 fw-bold">
+                                        <i class="bi bi-calendar3 me-1 text-warning"></i> {{ cita.fecha_cita.strftime('%d/%m/%Y') if cita.fecha_cita else '-' }}
+                                    </span>
+                                </td>
+                                <td class="fw-bold text-warning">{{ cita.hora_cita.strftime('%H:%M') if cita.hora_cita else '-' }}</td>
+                                <td>{{ cita.servicio.nombre_servicio if cita.servicio else 'No especificado' }}</td>
+                                <td>Don {{ cita.barbero.nombre }} {{ cita.barbero.apellido }}</td>
+                                <td class="text-warning fw-bold">${{ "%.2f"|format(cita.servicio.precio) if cita.servicio else "0.00" }}</td>
+                                <td>
+                                    <span class="badge {% if cita.estado == 'Pendiente' %}bg-warning text-dark{% elif cita.estado == 'Confirmada' %}bg-info text-dark{% elif cita.estado == 'Completada' %}bg-success text-white{% else %}bg-danger text-white{% endif %} px-3 py-1.5 fw-bold shadow-sm">
+                                        {{ cita.estado }}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    {% if cita.estado == 'Pendiente' %}
+                                    <div class="d-inline-flex gap-2">
+                                        <button type="button" class="btn btn-sm btn-outline-warning btn-editar-cita" 
+                                                data-bs-toggle="modal" data-bs-target="#modalEditarCita"
+                                                data-id="{{ cita.id_cita }}"
+                                                data-servicio="{{ cita.id_servicio }}"
+                                                data-barbero="{{ cita.id_barbero }}"
+                                                data-fecha="{{ cita.fecha_cita.strftime('%Y-%m-%d') if cita.fecha_cita else '' }}"
+                                                data-hora="{{ cita.hora_cita.strftime('%H:%M') if cita.hora_cita else '' }}">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+
+                                        <form action="{{ url_for('auth.eliminar_cita_cliente', cita_id=cita.id_cita) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas cancelar y eliminar permanentemente esta cita?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="bi bi-trash3"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                    {% else %}
+                                    <span class="text-muted small" style="font-style: italic;">No modificable</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5 rounded" style="background-color: #141517; border: 1px dashed #2c3034;">
+                    <i class="bi bi-calendar-x display-4 text-white-50 mb-3 d-block"></i>
+                    <p class="text-white-50 mb-0">Aún no has agendado ninguna cita.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL RESERVAR TURNO -->
+<div class="modal fade" id="modalAgendarCita" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content text-white shadow-lg" style="background-color: #16181b; border: 1px solid #c9a84c;">
+            <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold fs-4" style="color: #c9a84c;">
+                    <i class="bi bi-scissors me-2"></i> Reservar Turno
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            
+            <form action="{{ url_for('auth.agendar_cita_cliente') }}" method="POST">
+                <div class="modal-body p-4">
+                    
+                    <!-- 1. SELECCIONA EL SERVICIO -->
+                    <div class="mb-4">
+                        <label class="form-label text-warning fw-bold text-uppercase small tracking-wide mb-3">1. SELECCIONA EL SERVICIO</label>
+                        <div class="scroll-servicios">
+                            <div class="row g-3">
+                                {% for servicio in servicios %}
+                                <div class="col-md-4">
+                                    <input type="radio" name="id_servicio" id="serv_{{ servicio.id_servicio }}" value="{{ servicio.id_servicio }}" class="radio-servicio-input" required {% if loop.first %}checked{% endif %}>
+                                    <label for="serv_{{ servicio.id_servicio }}" class="tarjeta-servicio-label">
+                                        <div>
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <h6 class="fw-bold text-white mb-0 fs-5">{{ servicio.nombre_servicio }}</h6>
+                                                <span class="badge-precio-gold">${{ "%.2f"|format(servicio.precio) }}</span>
+                                            </div>
+                                            <p class="text-white-50 small mb-3">
+                                                {{ servicio.descripcion if servicio.descripcion else 'Servicio profesional de barbería y estilismo.' }}
+                                            </p>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center pt-2">
+                                            <span class="text-warning small fw-semibold">
+                                                <i class="bi bi-clock me-1"></i> {{ servicio.duracion_min if servicio.duracion_min else '30' }} min
+                                            </span>
+                                            <span class="badge-disponible-green">Disponible</span>
+                                        </div>
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2 Y 3. BARBERO Y FECHA -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label text-warning fw-bold text-uppercase small tracking-wide mb-2">2. SELECCIONA TU BARBERO</label>
+                            <select name="id_barbero" id="id_barbero" class="form-select input-dark-custom" required>
+                                <option value="" disabled selected>Selecciona un profesional...</option>
+                                {% for barbero in barberos %}
+                                    <option value="{{ barbero.id_usuario }}">Don {{ barbero.nombre }} {{ barbero.apellido }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-warning fw-bold text-uppercase small tracking-wide mb-2">3. FECHA DE LA CITA</label>
+                            <input type="text" name="fecha_cita" id="fecha_cita" class="form-control input-dark-custom" placeholder="Selecciona la fecha..." required>
+                        </div>
+                    </div>
+
+                    <!-- 4. SELECCIONA LA HORA -->
+                    <div class="mb-2">
+                        <label class="form-label text-warning fw-bold text-uppercase small tracking-wide mb-3">4. SELECCIONA LA HORA (ATENCIÓN 9 AM - 8 PM)</label>
+                        
+                        <div id="mensaje_horario_info" class="text-white-50 small italic mb-3">
+                            <i class="bi bi-info-circle me-1"></i> Selecciona un barbero y una fecha para desplegar los turnos disponibles.
+                        </div>
+
+                        <div class="grid-horas-contenedor d-none" id="contenedor_horarios">
+                            {% for h in ['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00'] %}
+                            <div>
+                                <input type="radio" name="hora_cita" id="hora_{{ loop.index }}" value="{{ h }}" class="radio-hora-input opcion-hora" required disabled>
+                                <label for="hora_{{ loop.index }}" class="btn-hora-label" id="lbl_hora_{{ h|replace(':', '') }}">
+                                    <i class="bi bi-clock text-warning"></i> {{ h }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer border-top-0 pt-0 pb-4 px-4">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-warning fw-bold px-4 text-dark">Confirmar Reserva</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL EDICIÓN DE CITA -->
+<div class="modal fade" id="modalEditarCita" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-white" style="background-color: #1a1c1e; border: 1px solid #c9a84c;">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title fw-bold" style="color: #c9a84c;"><i class="bi bi-pencil-square me-2"></i> Modificar Turno</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formEditarCita" method="POST" action="">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label text-warning small fw-bold text-uppercase">1. Servicio</label>
+                        <select name="id_servicio" id="edit_id_servicio" class="form-select bg-dark text-white border-secondary" required>
+                            {% for servicio in servicios %}
+                                <option value="{{ servicio.id_servicio }}">{{ servicio.nombre_servicio }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-warning small fw-bold text-uppercase">2. Barbero</label>
+                        <select name="id_barbero" id="edit_id_barbero" class="form-select bg-dark text-white border-secondary" required>
+                            {% for barbero in barberos %}
+                                <option value="{{ barbero.id_usuario }}">Don {{ barbero.nombre }} {{ barbero.apellido }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-warning small fw-bold text-uppercase">3. Fecha</label>
+                        <input type="text" name="fecha_cita" id="edit_fecha_cita" class="form-control bg-dark text-white border-secondary" placeholder="Selecciona la fecha..." required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-warning small fw-bold text-uppercase">4. Hora del Turno</label>
+                        <select name="hora_cita" id="edit_hora_cita" class="form-select bg-dark text-white border-secondary" required>
+                            {% for h in ['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00'] %}
+                                <option value="{{h}}">{{h}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 pt-0">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-warning btn-sm text-dark fw-bold">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    const barberoSelect = document.getElementById('id_barbero');
+    const fechaInput = document.getElementById('fecha_cita');
+    const contenedorHorarios = document.getElementById('contenedor_horarios');
+    const mensajeInfo = document.getElementById('mensaje_horario_info');
+    const horasInputs = document.querySelectorAll('.opcion-hora');
+
+    // Inicialización del Calendario Flatpickr para Reserva Nueva
+    const fpAgendar = flatpickr("#fecha_cita", {
+        locale: "es",
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "d/m/Y",
+        minDate: "today",
+        disableMobile: "true",
+        onChange: function(selectedDates, dateStr, instance) {
+            verificarHorarios();
+        }
+    });
+
+    // Inicialización del Calendario Flatpickr para Edición
+    const fpEditar = flatpickr("#edit_fecha_cita", {
+        locale: "es",
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "d/m/Y",
+        minDate: "today",
+        disableMobile: "true",
+        onChange: function(selectedDates, dateStr, instance) {
+            verificarHorariosEdicion();
+        }
+    });
+
+    function verificarHorarios() {
+        const idBarbero = barberoSelect.value;
+        const fechaCita = fechaInput.value;
+
+        if (!idBarbero || !fechaCita) {
+            contenedorHorarios.classList.add('d-none');
+            mensajeInfo.classList.remove('d-none');
+            mensajeInfo.className = "text-white-50 small italic mb-3";
+            mensajeInfo.innerHTML = '<i class="bi bi-info-circle me-1"></i> Selecciona un barbero y una fecha para desplegar los turnos disponibles.';
+            return;
+        }
+
+        fetch(`/auth/api/horarios-ocupados?id_barbero=${idBarbero}&fecha_cita=${fechaCita}`)
+            .then(res => res.json())
+            .then(data => {
+                // CASO 1: Sin disponibilidad
+                if (data.sin_disponibilidad) {
+                    contenedorHorarios.classList.add('d-none');
+                    mensajeInfo.classList.remove('d-none');
+                    mensajeInfo.className = "alert alert-warning text-center fw-bold fs-6";
+                    mensajeInfo.innerHTML = `
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        No tenemos turnos disponibles para esta fecha. Por favor, selecciona otro día u otro barbero.
+                    `;
+                    return;
+                }
+
+                // CASO 2: Horarios disponibles
+                if (data.horas_permitidas) {
+                    mensajeInfo.classList.add('d-none');
+                    mensajeInfo.className = "text-white-50 small italic mb-3";
+                    mensajeInfo.innerHTML = "";
+                    contenedorHorarios.classList.remove('d-none');
+
+                    horasInputs.forEach(input => {
+                        const valHora = input.value;
+                        const labelId = 'lbl_hora_' + valHora.replace(':', '');
+                        const labelElem = document.getElementById(labelId);
+
+                        const esAtendida = data.horas_permitidas.includes(valHora);
+                        const estaOcupada = data.horas_ocupadas.includes(valHora);
+
+                        if (!esAtendida || estaOcupada) {
+                            input.disabled = true;
+                            input.checked = false;
+                            if (labelElem) labelElem.classList.add('hora-desactivada');
+                        } else {
+                            input.disabled = false;
+                            if (labelElem) labelElem.classList.remove('hora-desactivada');
+                        }
+                    });
+                }
+            })
+            .catch(err => console.error("Error consultando horarios:", err));
+    }
+
+    if (barberoSelect) {
+        barberoSelect.addEventListener('change', verificarHorarios);
+    }
+
+    // --- CONTROL DE EDICIÓN DE CITAS ---
+    const editBarbero = document.getElementById('edit_id_barbero');
+    const editFecha = document.getElementById('edit_fecha_cita');
+    const editHora = document.getElementById('edit_hora_cita');
+    const formEditar = document.getElementById('formEditarCita');
+
+    function verificarHorariosEdicion() {
+        const idBarbero = editBarbero.value;
+        const fechaCita = editFecha.value;
+        if (!idBarbero || !fechaCita) return;
+
+        fetch(`/auth/api/horarios-ocupados?id_barbero=${idBarbero}&fecha_cita=${fechaCita}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.horas_ocupadas) {
+                    Array.from(editHora.options).forEach(opt => {
+                        if (data.horas_ocupadas.includes(opt.value)) {
+                            opt.disabled = true;
+                            opt.textContent = `${opt.value} (Ocupado 🚫)`;
+                            opt.style.color = '#dc3545';
+                        } else {
+                            opt.disabled = false;
+                            opt.textContent = opt.value;
+                            opt.style.color = '#ffffff';
+                        }
+                    });
+                }
+            });
+    }
+
+    if (editBarbero) {
+        editBarbero.addEventListener('change', verificarHorariosEdicion);
+    }
+
+    document.querySelectorAll('.btn-editar-cita').forEach(button => {
+        button.addEventListener('click', function() {
+            const idCita = this.getAttribute('data-id');
+            formEditar.action = `/auth/cliente/cita/editar/${idCita}`;
+            
+            document.getElementById('edit_id_servicio').value = this.getAttribute('data-servicio');
+            editBarbero.value = this.getAttribute('data-barbero');
+            
+            const fechaStr = this.getAttribute('data-fecha');
+            if (fechaStr) {
+                fpEditar.setDate(fechaStr, true);
+            }
+            
+            editHora.value = this.getAttribute('data-hora');
+            verificarHorariosEdicion();
+        });
+    });
+});
+</script>
+{% endblock %}

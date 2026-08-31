@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Barbería 022 | Cortes con oficio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="#" class="logo"><img src="{{ url_for('static', filename='img/landing/logo.png') }}" width="100" height="100"></a>
+    <!--<a href="#" class="logo">Emistyle <span class="accent"></span></a>-->
+    <ul class="nav-links">
+      <li><a href="#servicios">Servicios</a></li>
+      <li><a href="#galeria">Galería</a></li>
+      <li><a href="#testimonios">Testimonios</a></li>
+      <li><a href="#ubicacion">Ubicación</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="{{ url_for('auth.login') }}" class="btn btn-ghost">Iniciar sesión</a>
+      <a href="{{ url_for('auth.registro') }}" class="btn btn-gold"><i class="fa-solid fa-scissors"></i> Reservar cita</a>
+    </div>
+    <button class="nav-toggle" id="navToggle"><i class="fa-solid fa-bars"></i></button>
+  </div>
+</nav>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="container hero-content">
+    <div class="eyebrow">Barbería de barrio · a la vieja escuela</div>
+    <h1>EL CORTE QUE<br>DEFINE <span class="accent">TU ESTILO</span></h1>
+    <p class="lead">Navaja afilada, pulso firme y atención sin apuro. En Barbería 022 cada corte se hace con el mismo cuidado que el primero.</p>
+    <div class="hero-actions">
+      <a href="{{ url_for('auth.registro') }}" class="btn btn-gold"><i class="fa-solid fa-calendar-check"></i> Reservar mi cita</a>
+      <a href="#servicios" class="btn btn-ghost">Ver servicios</a>
+    </div>
+  </div>
+</header>
+
+<div class="barber-stripe"></div>
+
+
+
+<!-- ================= VIDEO / REEL ================= -->
+<section id="reel" class="bg-charcoal">
+  <div class="container reel-wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">Detrás de la silla</div>
+      <h2>Así trabajamos en Barbería 022</h2>
+      <p>Un vistazo rápido a cómo cuidamos cada detalle, del primer saludo al último repaso con navaja.</p>
+    </div>
+    <div class="reel-player reveal">
+      <video
+        controls
+        preload="metadata"
+        playsinline
+        poster="{{ url_for('static', filename='img/landing/hero-bg.jpg') }}">
+        <source src="{{ url_for('static', filename='video/landing/reel.mp4') }}" type="video/mp4">
+        Tu navegador no soporta la reproducción de video.
+      </video>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SERVICIOS ================= -->
+<section id="servicios">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="eyebrow">Servicios</div>
+      <h2>Lo que hacemos con navaja y peine</h2>
+      <p>Cada servicio se adapta a tu tipo de cabello y a lo que tengas en mente para el día. Sin prisa, sin plantillas.</p>
+    </div>
+    <div class="servicios-grid">
+      <div class="servicio-card reveal">
+        <i class="fa-solid fa-scissors"></i>
+        <h3>Corte Clásico</h3>
+        <p>Tijera y máquina, terminado prolijo, el corte de toda la vida hecho como se debe.</p>
+        <div class="precio">$8</div>
+      </div>
+      <div class="servicio-card reveal">
+        <i class="fa-solid fa-bolt"></i>
+        <h3>Fade Moderno</h3>
+        <p>Degradado preciso a la altura que pidas, de piel a piel o con volumen arriba.</p>
+        <div class="precio">$10</div>
+      </div>
+      <div class="servicio-card reveal">
+        <i class="fa-solid fa-pump-soap"></i>
+        <h3>Afeitado con Navaja</h3>
+        <p>Toalla caliente, espuma y navaja tradicional. Piel lisa, sin irritación.</p>
+        <div class="precio">$7</div>
+      </div>
+      <div class="servicio-card reveal">
+        <i class="fa-solid fa-star"></i>
+        <h3>Arreglo de Barba</h3>
+        <p>Perfilado, definición de línea y aceite para barba. Forma que respeta tu rostro.</p>
+        <div class="precio">$6</div>
+      </div>
+      <div class="servicio-card reveal">
+        <i class="fa-solid fa-crown"></i>
+        <h3>Combo Corte + Barba</h3>
+        <p>El paquete completo: corte, barba y afeitado de contorno en una sola sesión.</p>
+        <div class="precio">$14</div>
+      </div>
+      <div class="servicio-card reveal">
+        <i class="fa-solid fa-palette"></i>
+        <h3>Coloración</h3>
+        <p>Cobertura de canas o cambio de tono, con productos que cuidan el cabello.</p>
+        <div class="precio">$12</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= GALERÍA ================= -->
+<section id="galeria" class="bg-charcoal">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="eyebrow">Galería</div>
+      <h2>Momentos en el sillón</h2>
+    </div>
+    <div class="galeria-grid reveal">
+      <div class="g-item"><img src="{{ url_for('static', filename='img/landing/galeria-1.jpg') }}" alt="Corte en proceso"></div>
+      <div class="g-item"><img src="{{ url_for('static', filename='img/landing/galeria-2.jpg') }}" alt="Detalle de fade"></div>
+      <div class="g-item"><img src="{{ url_for('static', filename='img/landing/galeria-3.jpg') }}" alt="Afeitado con navaja"></div>
+      <div class="g-item"><img src="{{ url_for('static', filename='img/landing/galeria-4.jpg') }}" alt="Interior del local"></div>
+      <div class="g-item"><img src="{{ url_for('static', filename='img/landing/galeria-5.jpg') }}" alt="Herramientas de barbero"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TESTIMONIOS ================= -->
+<section id="testimonios" class="testimonios">
+  <div class="container">
+    <div class="section-head reveal section-head-center">
+      <div class="eyebrow justify-center">Testimonios</div>
+      <h2>Lo que dicen nuestros clientes</h2>
+    </div>
+    <div class="testi-track reveal">
+      <div class="testi-card active">
+        <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+        <p class="quote">"Voy cada tres semanas y nunca he salido con un corte que no me guste. El fade queda perfecto."</p>
+        <div class="cliente">
+          <img src="{{ url_for('static', filename='img/landing/cliente-1.jpg') }}" alt="Cliente">
+          <span>Daniel R.</span>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+        <p class="quote">"El afeitado con navaja es otro nivel. Ambiente tranquilo y te tratan con calma, no como línea de producción."</p>
+        <div class="cliente">
+          <img src="{{ url_for('static', filename='img/landing/cliente-2.jpg') }}" alt="Cliente">
+          <span>Mateo S.</span>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i></div>
+        <p class="quote">"Reservé por la app y me atendieron puntual. El combo de corte y barba vale cada centavo."</p>
+        <div class="cliente">
+          <img src="{{ url_for('static', filename='img/landing/cliente-3.jpg') }}" alt="Cliente">
+          <span>Andrés P.</span>
+        </div>
+      </div>
+    </div>
+    <div class="testi-dots" id="testiDots"></div>
+  </div>
+</section>
+
+<!-- ================= UBICACIÓN ================= -->
+<section id="ubicacion">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="eyebrow">Ubicación</div>
+      <h2>Encuéntranos</h2>
+    </div>
+    <div class="ubicacion-wrap reveal">
+      <div>
+        <div class="datos-item">
+          <i class="fa-solid fa-location-dot"></i>
+          <div>
+            <h4>Dirección</h4>
+            <p>Calle Fidel Martínez y León Rafael Larrea, Local 2<br>Quito - Norte - Calderón</p>
+          </div>
+        </div>
+        <div class="datos-item">
+          <i class="fa-solid fa-clock"></i>
+          <div>
+            <h4>Horario</h4>
+            <p>Lunes a sábado: 9:00 – 19:00<br>Domingo: cerrado</p>
+          </div>
+        </div>
+        <div class="datos-item">
+          <i class="fa-brands fa-whatsapp"></i>
+          <div>
+            <h4>Reservas rápidas</h4>
+            <p>+593 99 999 9999</p>
+          </div>
+        </div>
+      </div>
+      <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1994.907816072539!2d-78.41584624797756!3d-0.06651073192055314!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91d589311b271621%3A0x716c16908c2cf628!2sWHMP%2B84M%2C%20Fidel%20Martinez%2C%20170207%20Quito!5e0!3m2!1ses!2sec!4v1784698011902!5m2!1ses!2sec" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONTACTO ================= -->
+<section id="contacto" class="bg-charcoal">
+  <div class="container contacto-wrap">
+    <div class="reveal">
+      <div class="eyebrow">Contacto</div>
+      <h2>Escríbenos</h2>
+      <p class="text-note">¿Dudas sobre un servicio o quieres coordinar algo especial? Déjanos tu mensaje y te respondemos en el mismo día.</p>
+    </div>
+    <form class="reveal" method="POST" action="{{ url_for('contacto') }}">
+      <div class="form-group">
+        <label>Nombre</label>
+        <input type="text" name="nombre" required>
+      </div>
+      <div class="form-group">
+        <label>Correo electrónico</label>
+        <input type="email" name="email" required>
+      </div>
+      <div class="form-group">
+        <label>Mensaje</label>
+        <textarea name="mensaje" required></textarea>
+      </div>
+      <button type="submit" class="btn btn-gold"><i class="fa-solid fa-paper-plane"></i> Enviar mensaje</button>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="container footer-inner">
+    <a href="#" class="logo">BARBERÍA <span class="accent">022</span></a>
+    <div class="footer-social">
+      <a href="#"><i class="fa-brands fa-instagram"></i></a>
+      <a href="#"><i class="fa-brands fa-facebook"></i></a>
+      <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
+    </div>
+    <p class="footer-copy">© 2026 Barbería 022. Todos los derechos reservados.</p>
+  </div>
+</footer>
+
+<script>
+  // Menú móvil simple
+  const navToggle = document.getElementById('navToggle');
+  const navLinks = document.querySelector('.nav-links');
+  const navActions = document.querySelector('.nav-actions');
+  navToggle.addEventListener('click', () => {
+    const open = navLinks.style.display === 'flex';
+    navLinks.style.display = open ? 'none' : 'flex';
+    navActions.style.display = open ? 'none' : 'flex';
+    navLinks.style.flexDirection = 'column';
+    navActions.style.flexDirection = 'column';
+  });
+
+  // Reveal on scroll
+  const reveals = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('show'); });
+  }, { threshold: 0.15 });
+  reveals.forEach(el => io.observe(el));
+
+  // Carrusel de testimonios
+  const cards = document.querySelectorAll('.testi-card');
+  const dotsWrap = document.getElementById('testiDots');
+  let current = 0;
+  cards.forEach((_, i) => {
+    const dot = document.createElement('button');
+    if (i === 0) dot.classList.add('active');
+    dot.addEventListener('click', () => showTesti(i));
+    dotsWrap.appendChild(dot);
+  });
+  function showTesti(i) {
+    cards[current].classList.remove('active');
+    dotsWrap.children[current].classList.remove('active');
+    current = i;
+    cards[current].classList.add('active');
+    dotsWrap.children[current].classList.add('active');
+  }
+  setInterval(() => showTesti((current + 1) % cards.length), 6000);
+</script>
+
+</body>
+</html>
