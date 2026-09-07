@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../services/api_service.dart';
-import 'login_screen.dart';
+import '../../services/api_service.dart';
+import '../login_screen.dart';
+import 'reserva_screen.dart';
+import 'mis_citas_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -67,6 +69,17 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Text('Bienvenido, $_nombreUsuario'),
         actions: [
+          //: acceso rápido al historial de citas del cliente.
+          IconButton(
+            icon: const Icon(Icons.event_note),
+            tooltip: 'Mis Citas',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const MisCitasScreen()),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: _cerrarSesion,
@@ -102,7 +115,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             final servicio = _servicios[index];
                             // Determina si esta tarjeta específica está seleccionada
                             final esSeleccionado =
-                                _servicioSeleccionadoId == servicio['id'];
+                                _servicioSeleccionadoId ==
+                                servicio['id_servicio'];
 
                             return Card(
                               color: esSeleccionado
@@ -123,13 +137,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                   color: Colors.indigo,
                                 ),
                                 title: Text(
-                                  servicio['nombre'] ?? 'Servicio',
+                                  servicio['nombre_servicio'] ?? 'Servicio',
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 subtitle: Text(
-                                  '${servicio['descripcion'] ?? ''}\nDuración: ${servicio['duracion'] ?? '30'} min',
+                                  '${servicio['descripcion'] ?? ''}\nDuración: ${servicio['duracion_minutos'] ?? '30'} min',
                                 ),
                                 trailing: Text(
                                   '\$${servicio['precio'] ?? '0.00'}',
@@ -142,7 +156,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 onTap: () {
                                   // Cambia el ID del servicio seleccionado al hacer clic
                                   setState(() {
-                                    _servicioSeleccionadoId = servicio['id'];
+                                    _servicioSeleccionadoId =
+                                        servicio['id_servicio'];
                                   });
                                 },
                               ),
@@ -171,13 +186,15 @@ class _HomeScreenState extends State<HomeScreen> {
                               final barbero = _barberos[index];
                               // Determina si esta tarjeta de barbero está seleccionada
                               final esSeleccionado =
-                                  _barberoSeleccionadoId == barbero['id'];
+                                  _barberoSeleccionadoId ==
+                                  barbero['id_usuario'];
 
                               return GestureDetector(
                                 onTap: () {
                                   // Cambia el ID del barbero seleccionado
                                   setState(() {
-                                    _barberoSeleccionadoId = barbero['id'];
+                                    _barberoSeleccionadoId =
+                                        barbero['id_usuario'];
                                   });
                                 },
                                 child: Container(
@@ -242,10 +259,20 @@ class _HomeScreenState extends State<HomeScreen> {
                           (_servicioSeleccionadoId != null &&
                               _barberoSeleccionadoId != null)
                           ? () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'Servicio: $_servicioSeleccionadoId | Barbero: $_barberoSeleccionadoId seleccionado.',
+                              final servicio = _servicios.firstWhere(
+                                (s) =>
+                                    s['id_servicio'] == _servicioSeleccionadoId,
+                              );
+                              final barbero = _barberos.firstWhere(
+                                (b) =>
+                                    b['id_usuario'] == _barberoSeleccionadoId,
+                              );
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ReservaScreen(
+                                    servicio: servicio,
+                                    barbero: barbero,
                                   ),
                                 ),
                               );
