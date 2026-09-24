@@ -18,6 +18,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   // Variables de estado local para los datos del usuario y la lista de elementos
   String _nombreUsuario = '';
+  String? _fotoPerfil;
   List<dynamic> _servicios = [];
   List<dynamic> _barberos = [];
   bool _isLoading = true;
@@ -37,6 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _cargarDatos() async {
     final prefs = await SharedPreferences.getInstance();
     final nombre = prefs.getString('user_nombre') ?? 'Cliente';
+    final fotoPerfil = prefs.getString('user_foto_perfil');
 
     // Llamadas asíncronas para obtener catálogos de la API
     final servicios = await ApiService.getServicios();
@@ -45,6 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // Actualización del estado visual
     setState(() {
       _nombreUsuario = nombre;
+      _fotoPerfil = fotoPerfil;
       _servicios = servicios;
       _barberos = barberos;
       _isLoading = false;
@@ -100,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   Center(
                     child: FotoPerfilSelector(
-                      fotoActualUrl: null, // Aquí podrías pasar la URL de la foto actual si la tienes / / Luego lo conectamos con SharedPreferences/backend
+                      fotoActualUrl: _fotoPerfil, // Aquí podrías pasar la URL de la foto actual si la tienes / / Luego lo conectamos con SharedPreferences/backend
                     ),
                   ),
                   const SizedBox(height: 20),

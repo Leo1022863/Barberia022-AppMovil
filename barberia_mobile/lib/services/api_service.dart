@@ -51,6 +51,11 @@ class ApiService {
         //guardamos el rol para decidir a qué pantalla navegar
         await prefs.setString('user_rol', data['user']?['rol'] ?? 'Cliente');
 
+        await prefs.setString(
+          'user_foto_perfil',
+          data['user']['foto_perfil'] ?? '',
+        );
+
         return {'success': true, 'data': data};
       } else {
         return {

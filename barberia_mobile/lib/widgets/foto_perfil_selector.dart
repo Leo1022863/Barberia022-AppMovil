@@ -124,8 +124,9 @@ class _FotoPerfilSelectorState extends State<FotoPerfilSelector> {
       imagenAMostrar = FileImage(_imagenSeleccionada!);
     } else if (widget.fotoActualUrl != null &&
         widget.fotoActualUrl!.isNotEmpty) {
+      print('FOTO PERFIL: ${widget.fotoActualUrl}');
       imagenAMostrar = NetworkImage(
-        'http://10.0.2.2:5000${widget.fotoActualUrl}',
+        'http://192.168.110.221:5000${widget.fotoActualUrl}',
       );
     }
 

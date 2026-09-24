@@ -3,6 +3,7 @@ from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from Barberia0222.models import Usuario, Rol, Servicio, Cita, db
 from werkzeug.utils import secure_filename
+from datetime import datetime
 # Blueprint para la gestión de servicios, barberos y citas en la API
 api_barberia_bp = Blueprint('api_barberia', __name__, url_prefix='/api')
 
@@ -293,7 +294,7 @@ def obtener_todas_las_citas():
 # Carpeta donde se guardan las fotos de perfil. Al estar dentro de
 # 'static', Flask puede servirla directamente como archivo estático,
 # accesible vía URL sin lógica adicional.
-UPLOAD_FOLDER = os.path.join('static', 'uploads', 'perfiles')
+UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.dirname(__file__)),'static','uploads','perfiles')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 EXTENSIONES_PERMITIDAS = {'png', 'jpg', 'jpeg'}
@@ -339,7 +340,8 @@ def subir_foto_perfil(usuario_id):
         # Nombre fijo por usuario (usuario_<id>.ext): cada nueva foto
         # sobrescribe la anterior en vez de acumular archivos sueltos.
         extension = archivo.filename.rsplit('.', 1)[1].lower()
-        nombre_archivo = secure_filename(f'usuario_{usuario_id}.{extension}')
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        nombre_archivo = secure_filename(f'usuario_{usuario_id}_{timestamp}.{extension}')
         archivo.save(os.path.join(UPLOAD_FOLDER, nombre_archivo))
 
         # Guardamos la ruta RELATIVA (no absoluta del servidor), para que
