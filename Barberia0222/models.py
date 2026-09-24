@@ -23,6 +23,9 @@ class Usuario(UserMixin, db.Model): # type: ignore
     id_rol = db.Column(db.Integer, db.ForeignKey('roles.id_rol'))
     # Usamos timezone-aware objects para evitar advertencias de depreciación
     fecha_registro = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    # Ruta relativa (ej. /static/uploads/perfiles/usuario_5.jpg) de la foto
+    # de perfil del usuario. Nullable porque no todos la tendrán.
+    foto_perfil = db.Column(db.String(255), nullable=True)
 
     # Requerido por Flask-Login para identificar al usuario de forma única
     def get_id(self):

@@ -109,7 +109,7 @@ class _MisCitasScreenState extends State<MisCitasScreen> {
                     margin: const EdgeInsets.only(bottom: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
-                      side: BorderSide(color: color.withOpacity(0.4)),
+                      side: BorderSide(color: color.withValues(alpha: 0.4)),
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(14.0),

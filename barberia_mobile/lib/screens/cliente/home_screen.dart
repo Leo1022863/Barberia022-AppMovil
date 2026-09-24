@@ -6,6 +6,8 @@ import '../login_screen.dart';
 import 'reserva_screen.dart';
 import 'mis_citas_screen.dart';
 
+import '../../widgets/foto_perfil_selector.dart'; // NUEVO import
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -96,6 +98,13 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Center(
+                    child: FotoPerfilSelector(
+                      fotoActualUrl: null, // Aquí podrías pasar la URL de la foto actual si la tienes / / Luego lo conectamos con SharedPreferences/backend
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
                   // --- SECCIÓN 1: SELECCIÓN DE SERVICIO ---
                   const Text(
                     '1. Selecciona un Servicio',

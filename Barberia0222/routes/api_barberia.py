@@ -1,7 +1,8 @@
+import os
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from Barberia0222.models import Usuario, Rol, Servicio, Cita, db
-
+from werkzeug.utils import secure_filename
 # Blueprint para la gestión de servicios, barberos y citas en la API
 api_barberia_bp = Blueprint('api_barberia', __name__, url_prefix='/api')
 
@@ -286,4 +287,73 @@ def obtener_todas_las_citas():
 
         return jsonify({'success': True, 'citas': listado}), 200
     except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+# Carpeta donde se guardan las fotos de perfil. Al estar dentro de
+# 'static', Flask puede servirla directamente como archivo estático,
+# accesible vía URL sin lógica adicional.
+UPLOAD_FOLDER = os.path.join('static', 'uploads', 'perfiles')
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+EXTENSIONES_PERMITIDAS = {'png', 'jpg', 'jpeg'}
+
+
+def extension_permitida(filename):
+    """Verifica que el archivo recibido tenga una extensión de imagen
+    válida, evitando que se suban archivos arbitrarios al servidor."""
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in EXTENSIONES_PERMITIDAS
+
+
+# ---------------------------------------------------------
+# 10. POST /api/usuarios/<id>/foto (Subir foto de perfil) - Protegido por JWT
+# ---------------------------------------------------------
+@api_barberia_bp.route('/usuarios/<int:usuario_id>/foto', methods=['POST'])
+@jwt_required()
+def subir_foto_perfil(usuario_id):
+    """Recibe una imagen (multipart/form-data, campo 'foto', enviada desde
+    la cámara o la galería del dispositivo) y la guarda como la foto de
+    perfil del usuario. Solo el propio usuario autenticado puede
+    actualizar SU PROPIA foto (comparado contra el id del token JWT)."""
+    try:
+        current_user_id = get_jwt_identity()
+
+        if int(current_user_id) != usuario_id:
+            return jsonify({'success': False, 'message': 'No autorizado para modificar este usuario'}), 403
+
+        if 'foto' not in request.files:
+            return jsonify({'success': False, 'message': 'No se envió ningún archivo'}), 400
+
+        archivo = request.files['foto']
+
+        if archivo.filename == '':
+            return jsonify({'success': False, 'message': 'Nombre de archivo vacío'}), 400
+
+        if not extension_permitida(archivo.filename):
+            return jsonify({'success': False, 'message': 'Formato no permitido (usa jpg, jpeg o png)'}), 400
+
+        usuario = Usuario.query.get(usuario_id)
+        if not usuario:
+            return jsonify({'success': False, 'message': 'Usuario no encontrado'}), 404
+
+        # Nombre fijo por usuario (usuario_<id>.ext): cada nueva foto
+        # sobrescribe la anterior en vez de acumular archivos sueltos.
+        extension = archivo.filename.rsplit('.', 1)[1].lower()
+        nombre_archivo = secure_filename(f'usuario_{usuario_id}.{extension}')
+        archivo.save(os.path.join(UPLOAD_FOLDER, nombre_archivo))
+
+        # Guardamos la ruta RELATIVA (no absoluta del servidor), para que
+        # el cliente pueda construir la URL completa sin importar dónde
+        # esté desplegado el backend.
+        ruta_relativa = f'/static/uploads/perfiles/{nombre_archivo}'
+        usuario.foto_perfil = ruta_relativa
+        db.session.commit()
+
+        return jsonify({
+            'success': True,
+            'message': 'Foto de perfil actualizada correctamente',
+            'foto_perfil': ruta_relativa
+        }), 200
+    except Exception as e:
+        db.session.rollback()
         return jsonify({'success': False, 'message': str(e)}), 500

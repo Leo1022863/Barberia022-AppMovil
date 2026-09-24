@@ -3,9 +3,11 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'dart:io';
+
 class ApiService {
   // IP base que apunta al servidor local Flask desde el emulador de Android
-  static const String baseUrl = 'http://10.0.2.2:5000/api';
+  static const String baseUrl = 'http://192.168.110.221:5000/api';
 
   // Recupera el token JWT guardado localmente tras el login
   static Future<String?> _getToken() async {
@@ -328,6 +330,53 @@ class ApiService {
     } catch (e) {
       print('Error al obtener todas las citas: $e');
       return [];
+    }
+  }
+
+  /// --- SUBIR FOTO DE PERFIL ---
+  /// Envía la imagen (capturada con cámara o elegida de galería) al
+  /// backend mediante una petición multipart, necesaria para archivos
+  /// binarios (a diferencia del resto de peticiones JSON de esta clase).
+  static Future<Map<String, dynamic>> subirFotoPerfil(File imagen) async {
+    try {
+      final token = await _getToken();
+      final prefs = await SharedPreferences.getInstance();
+      final idUsuario = prefs.getInt('user_id') ?? 0;
+
+      if (token == null || token.isEmpty || idUsuario == 0) {
+        return {
+          'success': false,
+          'message': 'Sesión expirada. Vuelve a iniciar sesión.',
+        };
+      }
+
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$baseUrl/usuarios/$idUsuario/foto'),
+      );
+      request.headers['Authorization'] = 'Bearer $token';
+      request.files.add(await http.MultipartFile.fromPath('foto', imagen.path));
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200 && data['success'] == true) {
+        // Persistimos localmente la ruta devuelta, para mostrar el avatar
+        // sin depender de una nueva consulta al servidor cada vez.
+        await prefs.setString('user_foto_perfil', data['foto_perfil'] ?? '');
+        return {
+          'success': true,
+          'message': data['message'],
+          'foto_perfil': data['foto_perfil'],
+        };
+      }
+      return {
+        'success': false,
+        'message': data['message'] ?? 'No se pudo subir la foto',
+      };
+    } catch (e) {
+      return {'success': false, 'message': 'Error de conexión: $e'};
     }
   }
 }

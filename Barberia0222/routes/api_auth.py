@@ -50,7 +50,8 @@ def login_api():
                     'apellido': usuario.apellido,
                     'email': usuario.email,
                     'telefono': usuario.telefono,
-                    'rol': rol_nombre
+                    'rol': rol_nombre,
+                    'foto_perfil': usuario.foto_perfil  # <-- NUEVO
                 }
             }), 200
 

@@ -2,6 +2,10 @@
 
     <!-- Permiso obligatorio para permitir que la aplicación realice peticiones HTTP/HTTPS -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
+<!-- required="false": la app sigue siendo instalable en dispositivos sin
+     cámara (ej. tablets), ya que la galería sirve como alternativa -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />    
 
     <application
         android:label="barberia_mobile"

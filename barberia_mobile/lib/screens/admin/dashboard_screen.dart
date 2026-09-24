@@ -246,7 +246,7 @@ class _CitasTabState extends State<_CitasTab> {
             margin: const EdgeInsets.only(bottom: 10),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
-              side: BorderSide(color: color.withOpacity(0.4)),
+              side: BorderSide(color: color.withValues(alpha: 0.4)),
             ),
             child: Padding(
               padding: const EdgeInsets.all(12.0),
