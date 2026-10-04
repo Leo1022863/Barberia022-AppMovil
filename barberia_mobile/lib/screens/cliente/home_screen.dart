@@ -8,6 +8,9 @@ import 'mis_citas_screen.dart';
 
 import '../../widgets/foto_perfil_selector.dart'; // NUEVO import
 
+import '../../services/notification_service.dart';
+import '../../utils/permisos_helper.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -101,6 +104,25 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.notifications),
+                    label: const Text('Probar Notificación'),
+                    onPressed: () async {
+                      final permitido =
+                          await PermisosHelper.solicitarPermisoNotificaciones(
+                            context,
+                          );
+
+                      if (!permitido) return;
+
+                      await NotificationService.mostrarNotificacion(
+                        titulo: 'Barbería 022',
+                        mensaje: 'Esta es una notificación de prueba.',
+                      );
+                    },
+                  ),
+
+                  const SizedBox(height: 20),
                   Center(
                     child: FotoPerfilSelector(
                       fotoActualUrl: _fotoPerfil, // Aquí podrías pasar la URL de la foto actual si la tienes / / Luego lo conectamos con SharedPreferences/backend

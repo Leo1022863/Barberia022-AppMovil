@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 
-import 'screens/login_screen.dart';
+// import 'screens/login_screen.dart';
+import 'screens/splash_screen.dart';
+import 'services/notification_service.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await NotificationService.initialize();
+
   runApp(const MyApp());
 }
 
@@ -15,7 +21,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Barbería Mobile',
       theme: ThemeData(primarySwatch: Colors.indigo, useMaterial3: true),
-      home: const LoginScreen(),
+      home: const SplashScreen(),
     );
   }
 }

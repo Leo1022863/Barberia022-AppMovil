@@ -128,4 +128,20 @@ class PermisosHelper {
         return false;
     }
   }
+
+  /// Solicita el permiso de notificaciones.
+  ///
+  /// Android 13+ requiere autorización explícita.
+  /// iOS también requiere autorización del usuario.
+  static Future<bool> solicitarPermisoNotificaciones(
+    BuildContext context,
+  ) async {
+    return await solicitarPermiso(
+      context,
+      Permission.notification,
+      tituloExplicacion: 'Permitir notificaciones',
+      mensajeExplicacion: 'Barbería022 utilizará notificaciones para recordarte tus citas próximas y mejorar tu experiencia de uso.',
+      mensajeDenegadoPermanente: 'Las notificaciones fueron deshabilitadas permanentemente. Puedes volver a activarlas desde los ajustes del sistema.',
+    );
+  }
 }

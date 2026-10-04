@@ -4,6 +4,7 @@ import '../services/api_service.dart';
 import 'cliente/home_screen.dart';
 import 'barbero/agenda_screen.dart';
 import 'admin/dashboard_screen.dart';
+import 'registro_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -116,7 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
           // pantalla (sería intrusivo), pero SÍ empieza a validar en
           // vivo cada campo desde el momento en que el usuario lo toca
           // o escribe en él por primera vez.
-          autovalidateMode: AutovalidateMode.onUserInteraction,
+          autovalidateMode: AutovalidateMode.disabled,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -159,6 +160,19 @@ class _LoginScreenState extends State<LoginScreen> {
                       ? const CircularProgressIndicator()
                       : const Text('Iniciar Sesión'),
                 ),
+              ),
+              const SizedBox(height: 20),
+
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const RegistroScreen(),
+                    ),
+                  );
+                },
+                child: const Text('¿No tienes cuenta? Crear cuenta'),
               ),
             ],
           ),

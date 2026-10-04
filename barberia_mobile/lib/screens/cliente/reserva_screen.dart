@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../services/api_service.dart';
 
+import '../../services/notification_service.dart';
+
 /// Pantalla de confirmación de reserva. Recibe el servicio y el barbero
 /// ya seleccionados en HomeScreen, y permite al usuario elegir fecha, hora
 /// y agregar notas opcionales antes de enviar la cita al backend.
@@ -95,6 +97,15 @@ class _ReservaScreenState extends State<ReservaScreen> {
           backgroundColor: Colors.green,
         ),
       );
+      // --------------------------------------------------
+      // Notificación inmediata de confirmación
+      // --------------------------------------------------
+
+      await NotificationService.mostrarNotificacion(
+        titulo: 'Reserva confirmada',
+        mensaje: 'Tu cita fue registrada correctamente en Barbería 022.',
+      );
+
       // Regresa a HomeScreen (pop simple, ya que ReservaScreen fue abierta
       // con push, no con pushReplacement).
       Navigator.pop(context);

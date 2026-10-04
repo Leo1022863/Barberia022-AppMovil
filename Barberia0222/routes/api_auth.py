@@ -1,13 +1,14 @@
 from flask import Blueprint, request, jsonify
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 from flask_jwt_extended import create_access_token
-from Barberia0222.models import Usuario, Rol
+from Barberia0222.models import Usuario, Rol, db
 
 # Definición del Blueprint para las rutas de autenticación de la API móvil
 api_auth_bp = Blueprint('api_auth', __name__, url_prefix='/api/auth')
 
 @api_auth_bp.route('/login', methods=['POST'])
 def login_api():
+
     """
     Endpoint para autenticación de usuarios desde la app móvil (Flutter).
     Recibe email y contraseña en formato JSON, valida credenciales y 
@@ -61,3 +62,87 @@ def login_api():
     except Exception as e:
         # Manejo global de excepciones para evitar caídas del servidor (HTTP 500)
         return jsonify({'success': False, 'message': str(e)}), 500
+
+#API PARA REGISTRAR USUARIOS DESDE LA APP MOVIL 
+@api_auth_bp.route('/registro', methods=['POST'])
+def registro_api():
+    """
+    Endpoint para registrar nuevos usuarios desde Flutter.
+
+    Todo usuario nuevo se registra automáticamente
+    con el rol Cliente.
+    """
+
+    try:
+        data = request.get_json()
+
+        if not data:
+            return jsonify({
+                'success': False,
+                'message': 'No se recibieron datos'
+            }), 400
+
+        nombre = data.get('nombre')
+        apellido = data.get('apellido')
+        telefono = data.get('telefono')
+        email = data.get('email')
+        password = data.get('password')
+
+        # Validar campos obligatorios
+        if not all([nombre, apellido, telefono, email, password]):
+            return jsonify({
+                'success': False,
+                'message': 'Todos los campos son obligatorios'
+            }), 400
+
+        # Verificar correo duplicado
+        usuario_existente = Usuario.query.filter_by(
+            email=email
+        ).first()
+
+        if usuario_existente:
+            return jsonify({
+                'success': False,
+                'message': 'El correo electrónico ya está registrado'
+            }), 409
+
+        # Obtener rol Cliente
+        rol_cliente = Rol.query.filter_by(
+            nombre_rol='Cliente'
+        ).first()
+
+        if not rol_cliente:
+            return jsonify({
+                'success': False,
+                'message': 'No existe el rol Cliente'
+            }), 500
+
+        # Crear usuario
+        nuevo_usuario = Usuario(
+            nombre=nombre,
+            apellido=apellido,
+            telefono=telefono,
+            email=email,
+            password_hash=generate_password_hash(
+                password,
+                method='scrypt'
+            ),
+            id_rol=rol_cliente.id_rol
+        )
+
+        db.session.add(nuevo_usuario)
+        db.session.commit()
+
+        return jsonify({
+            'success': True,
+            'message': 'Usuario registrado correctamente'
+        }), 201
+
+    except Exception as e:
+
+        db.session.rollback()
+
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500

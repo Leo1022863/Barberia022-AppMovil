@@ -384,4 +384,47 @@ class ApiService {
       return {'success': false, 'message': 'Error de conexión: $e'};
     }
   }
+
+  /// ----------------------------------------------------------
+  /// REGISTRO DE NUEVOS USUARIOS
+  /// POST /api/auth/registro
+  /// ----------------------------------------------------------
+  static Future<Map<String, dynamic>> registrarUsuario({
+    required String nombre,
+    required String apellido,
+    required String telefono,
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/auth/registro'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({
+          'nombre': nombre,
+          'apellido': apellido,
+          'telefono': telefono,
+          'email': email,
+          'password': password,
+        }),
+      );
+
+      final data = jsonDecode(response.body);
+
+      if ((response.statusCode == 201 || response.statusCode == 200) &&
+          data['success'] == true) {
+        return {'success': true, 'message': data['message']};
+      }
+
+      return {
+        'success': false,
+        'message': data['message'] ?? 'No fue posible registrar el usuario',
+      };
+    } catch (e) {
+      return {'success': false, 'message': 'Error de conexión: $e'};
+    }
+  }
 }
